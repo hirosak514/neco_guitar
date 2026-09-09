@@ -18,49 +18,37 @@
         }
 
         h1 {
-            font-size: 1.8rem;
+            font-size: 2rem;
             color: #4a4a4a;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
-        /* 音楽プレイヤーエリア */
-        .music-player {
-            background: #fff;
-            padding: 15px 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        /* 1. 上半分のメイン画像エリア（元々の大きなイラスト表示部） */
+        .main-hero {
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
             margin-bottom: 2rem;
-            text-align: center;
-            width: 100%;
-            max-width: 400px;
-        }
-
-        /* 停止時のギャラリー（横スクロール） */
-        .static-gallery {
             display: flex;
-            gap: 15px;
-            overflow-x: auto;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 停止時のメイン画像 */
+        .main-hero-img {
             width: 100%;
-            max-width: 800px;
-            padding-bottom: 10px;
-        }
-
-        .gallery-item img {
-            width: 200px;
-            height: 200px;
+            height: 100%;
             object-fit: cover;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
-        /* 再生時のスライドショーエリア */
+        /* 再生時のスライドショー容器 */
         .slideshow-gallery {
             display: none; /* 初期状態は非表示 */
             position: relative;
             width: 100%;
-            max-width: 500px;
-            height: 350px;
-            margin: 0 auto;
+            height: 100%;
         }
 
         .slideshow-item {
@@ -81,14 +69,53 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        /* 2. 音楽プレイヤーエリア */
+        .music-player {
+            background: #fff;
+            padding: 15px 20px;
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        /* 3. 下半分のサムネイルギャラリー（横スクロール） */
+        .static-gallery {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            width: 100%;
+            max-width: 800px;
+            padding-bottom: 10px;
+        }
+
+        .gallery-item img {
+            width: 180px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
     </style>
 </head>
 <body>
 
     <h1>neco guitar</h1>
+
+    <!-- 上半分のメインビジュアルエリア -->
+    <div class="main-hero">
+        <!-- 音楽停止時に表示される代表画像 (logo002.jpg) -->
+        <img id="mainStaticImg" class="main-hero-img" src="logo002.jpg" alt="neco guitar main">
+        
+        <!-- 音楽再生時に切り替わるスライドショー -->
+        <div id="slideshowGallery" class="slideshow-gallery"></div>
+    </div>
 
     <!-- 音楽プレイヤー -->
     <section class="music-player">
@@ -99,22 +126,20 @@
         </audio>
     </section>
 
-    <!-- 通常表示（停止時）：静的ギャラリー -->
+    <!-- 下半分のサムネイルギャラリー一覧 -->
     <div id="staticGallery" class="static-gallery"></div>
-
-    <!-- 音楽再生時：スライドショー -->
-    <div id="slideshowGallery" class="slideshow-gallery"></div>
 
     <!-- JavaScript処理 -->
     <script>
         const audio = document.getElementById('bgm');
+        const mainStaticImg = document.getElementById('mainStaticImg');
         const staticGallery = document.getElementById('staticGallery');
         const slideshowGallery = document.getElementById('slideshowGallery');
         
         let slideIndex = 0;
         let slideTimer = null;
 
-        // 画像が存在するか確認するヘルパー関数
+        // 画像が存在するか確認する関数
         function checkImageExists(url) {
             return new Promise((resolve) => {
                 const img = new Image();
@@ -124,7 +149,7 @@
             });
         }
 
-        // ページ読み込み時に通常のギャラリーを作成する関数
+        // 1. 初期ロード時：下の小さなギャラリー一覧を読み込む
         async function loadInitialGallery() {
             staticGallery.innerHTML = '';
             let index = 2;
@@ -147,13 +172,12 @@
             }
         }
 
-        // 再生ボタンが押された際、キャッシュを回避して最新画像をスライドショーへ読み込む関数
+        // 2. 再生ボタン押下時：キャッシュをクリアして上部のスライドショーを読み込む
         async function loadImagesWithCacheBuster() {
             slideshowGallery.innerHTML = '';
-            
             let index = 2;
             let hasMore = true;
-            const timestamp = new Date().getTime(); // キャッシュクリア用タイムスタンプ
+            const timestamp = new Date().getTime(); // キャッシュ回避タイムスタンプ
 
             while (hasMore) {
                 const numStr = String(index).padStart(3, '0');
@@ -179,7 +203,7 @@
             }
         }
 
-        // スライドショー切り替え処理
+        // スライド切り替え処理
         function nextSlide() {
             const slides = slideshowGallery.querySelectorAll('.slideshow-item');
             if (slides.length <= 1) return;
@@ -189,31 +213,31 @@
             slides[slideIndex].classList.add('active');
         }
 
-        // 音楽再生時のイベント
+        // 音楽再生時の処理（メイン画像をスライドショーに切り替え）
         audio.addEventListener('play', async () => {
             slideIndex = 0;
 
-            // 最新の画像を強制再取得してスライドショー生成
+            // 最新画像をキャッシュ無視で取得
             await loadImagesWithCacheBuster();
 
-            staticGallery.style.display = 'none';
+            mainStaticImg.style.display = 'none';
             slideshowGallery.style.display = 'block';
 
             if (slideTimer) clearInterval(slideTimer);
-            slideTimer = setInterval(nextSlide, 4000); // 4秒ごとに切り替え
+            slideTimer = setInterval(nextSlide, 4000);
         });
 
-        // 音楽停止・終了時のイベント
+        // 音楽停止・終了時の処理（メイン画像に戻す）
         audio.addEventListener('pause', stopSlideshow);
         audio.addEventListener('ended', stopSlideshow);
 
         function stopSlideshow() {
             if (slideTimer) clearInterval(slideTimer);
             slideshowGallery.style.display = 'none';
-            staticGallery.style.display = 'flex';
+            mainStaticImg.style.display = 'block';
         }
 
-        // 初期読み込み
+        // 初期実行
         window.addEventListener('DOMContentLoaded', () => {
             loadInitialGallery();
         });
