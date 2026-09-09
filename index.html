@@ -3,54 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>neco guitar</title>
+    <title>neco guitar - 心に寄り添う弾き語り</title>
     <style>
-        /* 全体の基本スタイル */
-        body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            background-color: #f7f5f0;
-            color: #333;
+        * {
             margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            padding: 0;
+            box-sizing: border-box;
         }
-
+        body {
+            background-color: #ffffff;
+            color: #222222;
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+            line-height: 1.8;
+            letter-spacing: 0.05em;
+        }
+        header {
+            text-align: center;
+            padding: 3rem 1rem 1rem;
+        }
+        .logo-container {
+            max-width: 280px;
+            margin: 0 auto 1.5rem;
+        }
+        .logo-container video {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 8px;
+        }
+        .character-credit {
+            font-size: 0.75rem;
+            color: #888888;
+            margin-top: 0.5rem;
+            letter-spacing: 0.03em;
+        }
         h1 {
-            font-size: 2rem;
-            color: #4a4a4a;
+            font-size: 1.8rem;
+            font-weight: 300;
+            letter-spacing: 0.2em;
+            color: #111111;
+            margin-top: 1.5rem;
+        }
+        main {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 5rem;
+        }
+        .message-card {
+            background: #f9f9f9;
+            border: 1px solid #e5e5e5;
+            border-radius: 12px;
+            padding: 2.5rem 2rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+        }
+        .message-text {
+            font-size: 1rem;
             margin-bottom: 1.5rem;
+            color: #333333;
         }
-
-        /* 1. 上半分のメイン画像エリア（元々の大きなイラスト表示部） */
-        .main-hero {
-            width: 100%;
-            max-width: 600px;
-            height: 400px;
-            margin-bottom: 2rem;
+        .quote {
+            text-align: center;
+            font-size: 1.15rem;
+            font-weight: 500;
+            color: #111111;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e0e0e0;
+        }
+        /* ショップボタン */
+        .shop-link-container {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        .shop-button {
+            display: inline-block;
+            padding: 0.8rem 2.2rem;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            border: 1px solid #1a1a1a;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 0.95rem;
+            letter-spacing: 0.08em;
+            transition: all 0.3s ease;
+        }
+        .shop-button:hover {
+            background-color: #444444;
+            border-color: #444444;
+        }
+        .music-player {
+            background: #f4f4f4;
+            border: 1px solid #e0e0e0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .music-player p {
+            font-size: 0.9rem;
+            color: #666666;
+            margin-bottom: 0.5rem;
+        }
+        /* 通常時：手動でスムーズに横スクロールできるギャラリー */
+        .gallery-scroll-wrapper {
             display: flex;
-            justify-content: center;
-            align-items: center;
+            overflow-x: auto;
+            gap: 15px;
+            padding-bottom: 1rem;
+            margin: 0 auto 3rem;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
         }
-
-        /* 停止時のメイン画像 */
-        .main-hero-img {
+        .gallery-scroll-wrapper::-webkit-scrollbar {
+            height: 6px;
+        }
+        .gallery-scroll-wrapper::-webkit-scrollbar-thumb {
+            background: #cccccc;
+            border-radius: 3px;
+        }
+        .gallery-item {
+            flex: 0 0 200px;
+            text-align: center;
+        }
+        .gallery-item img {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 16px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            height: auto;
+            display: block;
+            border-radius: 8px;
         }
-
-        /* 再生時のスライドショー容器 */
-        .slideshow-gallery {
-            display: none; /* 初期状態は非表示 */
+        /* 音楽再生時：スライドショー */
+        .slideshow-container {
+            display: none;
             position: relative;
-            width: 100%;
-            height: 100%;
+            max-width: 380px;
+            height: 380px;
+            margin: 0 auto 3rem;
         }
-
         .slideshow-item {
             position: absolute;
             top: 0;
@@ -58,88 +147,101 @@
             width: 100%;
             height: 100%;
             opacity: 0;
-            transition: opacity 1s ease-in-out;
+            transition: opacity 1.2s ease-in-out;
         }
-
+        .slideshow-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
         .slideshow-item.active {
             opacity: 1;
         }
-
-        .slideshow-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 16px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        @media (max-width: 500px) {
+            .gallery-item {
+                flex: 0 0 70%;
+            }
+            .slideshow-container {
+                max-width: 100%;
+                height: auto;
+            }
         }
-
-        /* 2. 音楽プレイヤーエリア */
-        .music-player {
-            background: #fff;
-            padding: 15px 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            margin-bottom: 2rem;
+        footer {
             text-align: center;
-            width: 100%;
-            max-width: 400px;
+            padding: 2rem;
+            font-size: 0.8rem;
+            color: #888888;
+            border-top: 1px solid #eeeeee;
+            line-height: 1.6;
         }
-
-        /* 3. 下半分のサムネイルギャラリー（横スクロール） */
-        .static-gallery {
-            display: flex;
-            gap: 15px;
-            overflow-x: auto;
-            width: 100%;
-            max-width: 800px;
-            padding-bottom: 10px;
-        }
-
-        .gallery-item img {
-            width: 180px;
-            height: 180px;
-            object-fit: cover;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        footer p {
+            margin-bottom: 0.3rem;
         }
     </style>
 </head>
 <body>
+    <header>
+        <div class="logo-container">
+            <video autoplay loop muted playsinline controls>
+                <source src="001.mp4" type="video/mp4">
+                <img src="logo001.jpg" alt="neco guitar logo">
+            </video>
+            <p class="character-credit">Character Design by Kite Minowa</p>
+        </div>
+        <h1>neco guitar</h1>
+    </header>
 
-    <h1>neco guitar</h1>
+    <main>
+        <section class="message-card">
+            <p class="message-text">
+                今日も“ひとり時間”をあたたかくする弾き語りのシーン。<br>
+                深みのあるギターの音色が、静かな気持ちをそっと引き出してくれるよ。
+            </p>
+            <p class="message-text">
+                弦をたどる指先、やさしく響く音、そして聴こえてくる君のためのメッセージ。
+            </p>
+            <p class="message-text">
+                派手じゃないのに不思議と心に残るこの歌。<br>
+                ちょっと疲れた日、言葉が見つからない夜にも、静かにメロディが寄り添ってくれるはず。
+            </p>
+            <p class="quote">
+                「僕の弾き語りで君の心を癒すよ」<br>
+                <span style="font-size: 0.95rem; font-weight: normal; color: #666;">そんな気持ちで、君に届けるんだ。</span>
+            </p>
+        </section>
 
-    <!-- 上半分のメインビジュアルエリア -->
-    <div class="main-hero">
-        <!-- 音楽停止時に表示される代表画像 (logo002.jpg) -->
-        <img id="mainStaticImg" class="main-hero-img" src="logo002.jpg" alt="neco guitar main">
-        
-        <!-- 音楽再生時に切り替わるスライドショー -->
-        <div id="slideshowGallery" class="slideshow-gallery"></div>
-    </div>
+        <div class="shop-link-container">
+            <a href="https://suzuri.jp/neco_guitar?utm_source=others&utm_medium=social&utm_campaign=shop_share" target="_blank" rel="noopener noreferrer" class="shop-button">
+                SUZURI Official Shop
+            </a>
+        </div>
 
-    <!-- 音楽プレイヤー -->
-    <section class="music-player">
-        <p>Tonight's Acoustic Song</p>
-        <audio id="bgm" controls style="width: 100%;">
-            <source src="music.mp3" type="audio/mpeg">
-            お使いのブラウザは音声再生に対応していません。
-        </audio>
-    </section>
+        <section class="music-player">
+            <p>Tonight's Acoustic Song</p>
+            <audio id="bgm" controls style="width: 100%; max-width: 400px; margin-top: 0.5rem;">
+                <source src="music.mp3" type="audio/mpeg">
+                お使いのブラウザは音声再生に対応していません。
+            </audio>
+        </section>
 
-    <!-- 下半分のサムネイルギャラリー一覧 -->
-    <div id="staticGallery" class="static-gallery"></div>
+        <div class="gallery-scroll-wrapper" id="staticGallery"></div>
+        <div class="slideshow-container" id="slideshowGallery"></div>
+    </main>
 
-    <!-- JavaScript処理 -->
+    <footer>
+        <p>Character Design &copy; Kite Minowa</p>
+        <p>&copy; neco guitar. All Rights Reserved.</p>
+    </footer>
+
     <script>
         const audio = document.getElementById('bgm');
-        const mainStaticImg = document.getElementById('mainStaticImg');
         const staticGallery = document.getElementById('staticGallery');
         const slideshowGallery = document.getElementById('slideshowGallery');
         
         let slideIndex = 0;
         let slideTimer = null;
 
-        // 画像が存在するか確認する関数
+        // 画像の存在確認関数
         function checkImageExists(url) {
             return new Promise((resolve) => {
                 const img = new Image();
@@ -149,61 +251,66 @@
             });
         }
 
-        // 1. 初期ロード時：下の小さなギャラリー一覧を読み込む
+        // 1. 初期表示用（通常ギャラリーの読み込み）
         async function loadInitialGallery() {
             staticGallery.innerHTML = '';
-            let index = 2;
+            let startIndex = 2;
             let hasMore = true;
 
             while (hasMore) {
-                const numStr = String(index).padStart(3, '0');
+                const numStr = String(startIndex).padStart(3, '0');
                 const rawUrl = `logo${numStr}.jpg`;
 
                 const exists = await checkImageExists(rawUrl);
                 if (exists) {
                     const item = document.createElement('div');
                     item.className = 'gallery-item';
-                    item.innerHTML = `<img src="${rawUrl}" alt="neco guitar logo ${index}">`;
+                    item.innerHTML = `<img src="${rawUrl}" alt="neco guitar logo ${startIndex}">`;
                     staticGallery.appendChild(item);
-                    index++;
+                    startIndex++;
                 } else {
                     hasMore = false;
                 }
             }
         }
 
-        // 2. 再生ボタン押下時：キャッシュをクリアして上部のスライドショーを読み込む
+        // 2. 再生ボタン押下時（キャッシュ回避して最新追加画像を読み込み・スライドショー生成）
         async function loadImagesWithCacheBuster() {
             slideshowGallery.innerHTML = '';
-            let index = 2;
+            let startIndex = 2;
             let hasMore = true;
-            const timestamp = new Date().getTime(); // キャッシュ回避タイムスタンプ
+            const timestamp = new Date().getTime(); // キャッシュクリア用タイムスタンプ
 
             while (hasMore) {
-                const numStr = String(index).padStart(3, '0');
+                const numStr = String(startIndex).padStart(3, '0');
                 const rawUrl = `logo${numStr}.jpg`;
                 const cacheBustUrl = `${rawUrl}?t=${timestamp}`;
 
                 const exists = await checkImageExists(cacheBustUrl);
-
                 if (exists) {
                     const slideItem = document.createElement('div');
                     slideItem.className = 'slideshow-item';
-                    slideItem.innerHTML = `<img src="${cacheBustUrl}" alt="neco guitar logo ${index}">`;
+                    slideItem.innerHTML = `<img src="${cacheBustUrl}" alt="neco guitar logo ${startIndex}">`;
                     slideshowGallery.appendChild(slideItem);
-                    index++;
+                    startIndex++;
                 } else {
                     hasMore = false;
                 }
             }
 
+            // 最初のスライドを表示状態にする
             const firstSlide = slideshowGallery.querySelector('.slideshow-item');
             if (firstSlide) {
                 firstSlide.classList.add('active');
             }
         }
 
-        // スライド切り替え処理
+        // ページ読み込み時
+        window.addEventListener('DOMContentLoaded', () => {
+            loadInitialGallery();
+        });
+
+        // スライドショー切り替え処理
         function nextSlide() {
             const slides = slideshowGallery.querySelectorAll('.slideshow-item');
             if (slides.length <= 1) return;
@@ -213,34 +320,29 @@
             slides[slideIndex].classList.add('active');
         }
 
-        // 音楽再生時の処理（メイン画像をスライドショーに切り替え）
+        // 音楽再生時
         audio.addEventListener('play', async () => {
             slideIndex = 0;
 
-            // 最新画像をキャッシュ無視で取得
+            // 再生ボタンが押されたタイミングでキャッシュを無効化して最新画像を取得
             await loadImagesWithCacheBuster();
 
-            mainStaticImg.style.display = 'none';
+            staticGallery.style.display = 'none';
             slideshowGallery.style.display = 'block';
 
             if (slideTimer) clearInterval(slideTimer);
-            slideTimer = setInterval(nextSlide, 4000);
+            slideTimer = setInterval(nextSlide, 4000); // 4秒ごとにフェード切替
         });
 
-        // 音楽停止・終了時の処理（メイン画像に戻す）
+        // 音楽停止時
         audio.addEventListener('pause', stopSlideshow);
         audio.addEventListener('ended', stopSlideshow);
 
         function stopSlideshow() {
             if (slideTimer) clearInterval(slideTimer);
             slideshowGallery.style.display = 'none';
-            mainStaticImg.style.display = 'block';
+            staticGallery.style.display = 'flex';
         }
-
-        // 初期実行
-        window.addEventListener('DOMContentLoaded', () => {
-            loadInitialGallery();
-        });
     </script>
 </body>
 </html>
