@@ -204,7 +204,7 @@
             z-index: 1000;
             background: #0d0d0d;
             overscroll-behavior: contain;
-            touch-action: pan-y;
+            touch-action: none;
         }
         .art-viewer.open {
             display: block;
@@ -713,6 +713,12 @@
             touchTracking = true;
         }, { passive: true });
 
+        artStage.addEventListener('touchmove', (e) => {
+            // 全画面ビューア内では縦横どちらのジェスチャーもスライド操作に使うため、
+            // ブラウザ標準のスクロールやプルダウン更新を発生させない
+            if (touchTracking) e.preventDefault();
+        }, { passive: false });
+
         artStage.addEventListener('touchend', (e) => {
             if (!touchTracking) return;
             touchTracking = false;
@@ -720,10 +726,16 @@
             const touch = e.changedTouches[0];
             const dx = touch.clientX - touchStartX;
             const dy = touch.clientY - touchStartY;
+            const SWIPE_THRESHOLD = 50;
 
-            // 横方向の移動が十分大きいときだけページ送り
-            if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
-                goToArtSlide(dx < 0 ? 1 : -1); // 左スワイプ＝次、右スワイプ＝前
+            if (Math.abs(dx) < SWIPE_THRESHOLD && Math.abs(dy) < SWIPE_THRESHOLD) return;
+
+            if (Math.abs(dx) > Math.abs(dy)) {
+                // 横スワイプ：左＝次、右＝前
+                goToArtSlide(dx < 0 ? 1 : -1);
+            } else {
+                // 縦スワイプ：上＝次、下＝前
+                goToArtSlide(dy < 0 ? 1 : -1);
             }
         }, { passive: true });
     </script>
