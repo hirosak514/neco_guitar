@@ -17,6 +17,9 @@
             line-height: 1.8;
             letter-spacing: 0.05em;
         }
+        body.art-open {
+            overflow: hidden;
+        }
         header {
             text-align: center;
             padding: 3rem 1rem 1rem;
@@ -166,6 +169,167 @@
                 height: auto;
             }
         }
+        /* neco Art を開くボタン */
+        .art-link-container {
+            text-align: center;
+            margin: 0 auto 3rem;
+        }
+        .art-open-button {
+            display: inline-block;
+            padding: 0.8rem 2.2rem;
+            background-color: #ffffff;
+            color: #1a1a1a;
+            border: 1px solid #1a1a1a;
+            border-radius: 30px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            letter-spacing: 0.08em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .art-open-button:hover {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+        .art-open-button:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+
+        /* 全画面アートビューア */
+        .art-viewer {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: #0d0d0d;
+            overscroll-behavior: contain;
+            touch-action: pan-y;
+        }
+        .art-viewer.open {
+            display: block;
+        }
+        .art-stage {
+            position: absolute;
+            inset: 0;
+        }
+        .art-slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            pointer-events: none;
+        }
+        .art-slide.active {
+            opacity: 1;
+        }
+        .art-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .art-loading {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #cccccc;
+            font-size: 0.9rem;
+            letter-spacing: 0.1em;
+        }
+        /* 左右のホバーゾーン（PC） */
+        .art-zone {
+            position: absolute;
+            top: 0;
+            bottom: 5.5rem;
+            width: 28%;
+            display: flex;
+            align-items: center;
+            border: 0;
+            background: transparent;
+            color: #ffffff;
+            font-size: 2.4rem;
+            line-height: 1;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .art-zone:hover,
+        .art-zone:focus-visible {
+            opacity: 1;
+            outline: none;
+        }
+        .art-zone-prev {
+            left: 0;
+            justify-content: flex-start;
+            padding-left: 1.5rem;
+            background: linear-gradient(to right, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0));
+        }
+        .art-zone-next {
+            right: 0;
+            justify-content: flex-end;
+            padding-right: 1.5rem;
+            background: linear-gradient(to left, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0));
+        }
+        .art-zone span {
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+        }
+        /* 下部コントロール */
+        .art-controls {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1.2rem 1rem calc(1.2rem + env(safe-area-inset-bottom, 0px));
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0));
+        }
+        .art-control {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            background: rgba(0, 0, 0, 0.35);
+            color: #ffffff;
+            font-size: 1.2rem;
+            line-height: 1;
+            cursor: pointer;
+            transition: background 0.25s ease, border-color 0.25s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .art-control:hover,
+        .art-control:focus-visible {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #ffffff;
+            outline: none;
+        }
+        .art-counter {
+            position: absolute;
+            top: calc(1rem + env(safe-area-inset-top, 0px));
+            right: 1.2rem;
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+        }
+        /* タッチ端末ではホバー矢印を出さず、スワイプ操作にする */
+        @media (hover: none) {
+            .art-zone {
+                display: none;
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .art-slide {
+                transition: none;
+            }
+        }
         footer {
             text-align: center;
             padding: 2rem;
@@ -226,6 +390,10 @@
 
         <div class="gallery-scroll-wrapper" id="staticGallery"></div>
         <div class="slideshow-container" id="slideshowGallery"></div>
+
+        <div class="art-link-container">
+            <button type="button" class="art-open-button" id="artOpenButton">neco Art</button>
+        </div>
     </main>
 
     <footer>
@@ -233,11 +401,28 @@
         <p>&copy; neco guitar. All Rights Reserved.</p>
     </footer>
 
+    <!-- 全画面アートビューア -->
+    <div class="art-viewer" id="artViewer" role="dialog" aria-modal="true" aria-label="neco Art">
+        <div class="art-stage" id="artStage">
+            <div class="art-loading" id="artLoading">絵を読み込み中…</div>
+        </div>
+
+        <button type="button" class="art-zone art-zone-prev" id="artPrevZone" aria-label="前の絵"><span>◀</span></button>
+        <button type="button" class="art-zone art-zone-next" id="artNextZone" aria-label="次の絵"><span>▶</span></button>
+
+        <p class="art-counter" id="artCounter"></p>
+
+        <div class="art-controls">
+            <button type="button" class="art-control" id="artPauseButton" aria-label="一時停止">&#10074;&#10074;</button>
+            <button type="button" class="art-control" id="artHomeButton" aria-label="ホームへ戻る">&#8592;</button>
+        </div>
+    </div>
+
     <script>
         const audio = document.getElementById('bgm');
         const staticGallery = document.getElementById('staticGallery');
         const slideshowGallery = document.getElementById('slideshowGallery');
-        
+
         let slideIndex = 0;
         let slideTimer = null;
 
@@ -343,6 +528,175 @@
             slideshowGallery.style.display = 'none';
             staticGallery.style.display = 'flex';
         }
+
+        /* ================================
+           neco Art（全画面スライドショー）
+           ================================ */
+        const ART_MAX_NUMBER = 60;   // art001〜art060 まで探索（飛び番号に対応）
+        const ART_INTERVAL = 4000;   // 4秒間隔
+
+        const artOpenButton = document.getElementById('artOpenButton');
+        const artViewer = document.getElementById('artViewer');
+        const artStage = document.getElementById('artStage');
+        const artLoading = document.getElementById('artLoading');
+        const artCounter = document.getElementById('artCounter');
+        const artPauseButton = document.getElementById('artPauseButton');
+        const artHomeButton = document.getElementById('artHomeButton');
+        const artPrevZone = document.getElementById('artPrevZone');
+        const artNextZone = document.getElementById('artNextZone');
+
+        const PAUSE_MARK = '\u275A\u275A'; // ❚❚
+        const PLAY_MARK = '\u25B6';        // ▶
+
+        let artSlides = [];
+        let artIndex = 0;
+        let artTimer = null;
+        let artPaused = false;
+        let artLoaded = false;
+
+        // art001.jpg 形式の画像を探し、数字の小さい順に並べる
+        async function loadArtImages() {
+            const timestamp = new Date().getTime();
+            const checks = [];
+
+            for (let i = 1; i <= ART_MAX_NUMBER; i++) {
+                const numStr = String(i).padStart(3, '0');
+                const url = `art${numStr}.jpg?t=${timestamp}`;
+                checks.push(
+                    checkImageExists(url).then((exists) => (exists ? { number: i, url } : null))
+                );
+            }
+
+            const results = await Promise.all(checks);
+            const found = results
+                .filter(Boolean)
+                .sort((a, b) => a.number - b.number); // 数字の小さい順
+
+            artStage.innerHTML = '';
+            found.forEach((art, index) => {
+                const slide = document.createElement('div');
+                slide.className = 'art-slide' + (index === 0 ? ' active' : '');
+                slide.innerHTML = `<img src="${art.url}" alt="neco art ${art.number}" draggable="false">`;
+                artStage.appendChild(slide);
+            });
+
+            artSlides = Array.from(artStage.querySelectorAll('.art-slide'));
+
+            if (artSlides.length === 0) {
+                artStage.innerHTML = '<div class="art-loading">表示できる絵がありません</div>';
+            }
+        }
+
+        function updateArtCounter() {
+            artCounter.textContent = artSlides.length
+                ? `${artIndex + 1} / ${artSlides.length}`
+                : '';
+        }
+
+        function showArtSlide(index) {
+            if (artSlides.length === 0) return;
+            artSlides[artIndex].classList.remove('active');
+            artIndex = (index + artSlides.length) % artSlides.length;
+            artSlides[artIndex].classList.add('active');
+            updateArtCounter();
+        }
+
+        function startArtTimer() {
+            clearInterval(artTimer);
+            if (artSlides.length <= 1) return;
+            artTimer = setInterval(() => showArtSlide(artIndex + 1), ART_INTERVAL);
+        }
+
+        // 手動で送ったときもタイマーをリセット（一時停止中はそのまま停止を維持）
+        function goToArtSlide(step) {
+            showArtSlide(artIndex + step);
+            if (!artPaused) startArtTimer();
+        }
+
+        function setArtPaused(paused) {
+            artPaused = paused;
+            if (paused) {
+                clearInterval(artTimer);
+                artPauseButton.innerHTML = PLAY_MARK;
+                artPauseButton.setAttribute('aria-label', '再生');
+            } else {
+                artPauseButton.innerHTML = PAUSE_MARK;
+                artPauseButton.setAttribute('aria-label', '一時停止');
+                startArtTimer();
+            }
+        }
+
+        async function openArtViewer() {
+            artViewer.classList.add('open');
+            document.body.classList.add('art-open');
+
+            if (!artLoaded) {
+                artOpenButton.disabled = true;
+                artLoading.textContent = '絵を読み込み中…';
+                await loadArtImages();
+                artLoaded = true;
+                artOpenButton.disabled = false;
+            }
+
+            artIndex = 0;
+            if (artSlides.length) {
+                artSlides.forEach((slide, i) => slide.classList.toggle('active', i === 0));
+            }
+            updateArtCounter();
+            setArtPaused(false);
+            artHomeButton.focus();
+        }
+
+        function closeArtViewer() {
+            clearInterval(artTimer);
+            artViewer.classList.remove('open');
+            document.body.classList.remove('art-open');
+            artOpenButton.focus();
+        }
+
+        artOpenButton.addEventListener('click', openArtViewer);
+        artHomeButton.addEventListener('click', closeArtViewer);
+        artPauseButton.addEventListener('click', () => setArtPaused(!artPaused));
+        artPrevZone.addEventListener('click', () => goToArtSlide(-1));
+        artNextZone.addEventListener('click', () => goToArtSlide(1));
+
+        // キーボード操作（PC）
+        document.addEventListener('keydown', (e) => {
+            if (!artViewer.classList.contains('open')) return;
+            if (e.key === 'ArrowRight') goToArtSlide(1);
+            else if (e.key === 'ArrowLeft') goToArtSlide(-1);
+            else if (e.key === 'Escape') closeArtViewer();
+            else if (e.key === ' ') {
+                e.preventDefault();
+                setArtPaused(!artPaused);
+            }
+        });
+
+        // スワイプ操作（スマホ）
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchTracking = false;
+
+        artStage.addEventListener('touchstart', (e) => {
+            if (e.touches.length !== 1) return;
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            touchTracking = true;
+        }, { passive: true });
+
+        artStage.addEventListener('touchend', (e) => {
+            if (!touchTracking) return;
+            touchTracking = false;
+
+            const touch = e.changedTouches[0];
+            const dx = touch.clientX - touchStartX;
+            const dy = touch.clientY - touchStartY;
+
+            // 横方向の移動が十分大きいときだけページ送り
+            if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+                goToArtSlide(dx < 0 ? 1 : -1); // 左スワイプ＝次、右スワイプ＝前
+            }
+        }, { passive: true });
     </script>
 </body>
 </html>
