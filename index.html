@@ -311,6 +311,32 @@
             border-color: #ffffff;
             outline: none;
         }
+        /* 戻るボタンは一時停止ボタンと形・文字ラベルではっきり区別する */
+        .art-control-home {
+            width: auto;
+            height: 3rem;
+            border-radius: 30px;
+            padding: 0 1.4rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.92);
+            color: #1a1a1a;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            font-weight: 500;
+        }
+        .art-control-home:hover,
+        .art-control-home:focus-visible {
+            background: #ffffff;
+            border-color: #ffffff;
+            color: #1a1a1a;
+        }
+        .art-control-home .art-control-icon {
+            font-size: 1.1rem;
+            line-height: 1;
+        }
         .art-counter {
             position: absolute;
             top: calc(1rem + env(safe-area-inset-top, 0px));
@@ -414,7 +440,10 @@
 
         <div class="art-controls">
             <button type="button" class="art-control" id="artPauseButton" aria-label="一時停止">&#10074;&#10074;</button>
-            <button type="button" class="art-control" id="artHomeButton" aria-label="ホームへ戻る">&#8592;</button>
+            <button type="button" class="art-control art-control-home" id="artHomeButton" aria-label="ホームへ戻る">
+                <span class="art-control-icon" aria-hidden="true">&#10005;</span>
+                <span>閉じる</span>
+            </button>
         </div>
     </div>
 
